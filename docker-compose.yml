@@ -1,0 +1,32 @@
+networks:
+  php_pro:
+    driver: bridge
+
+volumes:
+  database_volume:
+    driver: local
+
+services:
+  app:
+    build:
+      context: php
+    restart: always
+    ports:
+      - 8081:80
+    volumes:
+      - .:/var/www/html
+    networks:
+      - php_pro
+
+  database:
+    image: 'mysql:8'
+    restart: always
+    ports:
+      - '3306:3306'
+    volumes:
+      - 'database_volume:/var/lib/mysql'
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: database
+    networks:
+      - php_pro
