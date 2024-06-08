@@ -17,5 +17,7 @@
       "email": "besha2vox@gmail.com"
     }
   ],
-  "require": {}
+  "require": {
+    "larapack/dd": "^1.1"
+  }
 }
