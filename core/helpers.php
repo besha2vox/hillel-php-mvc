@@ -1,6 +1,12 @@
 <?php
 
 use App\Enums\Http\Status;
+use Core\DB;
+
+function db()
+{
+    return DB::connect();
+}
 
 function jsonResponse(Status $status, $data = []): string
 {
