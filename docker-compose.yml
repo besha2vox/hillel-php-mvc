@@ -15,7 +15,7 @@ services:
       - 8080:80
     volumes:
       - .:/var/www/html
-    command: /usr/bin/sh -c "/usr/bin/chmod +x /var/www/html/migration.sh && ln -s /var/www/html/migration.sh /usr/local/bin/migration && apache2-foreground"
+    command: /usr/bin/sh -c "/usr/bin/chmod +x /var/www/html/migration && ln -s /var/www/html/migration /usr/local/bin/migration && apache2-foreground"
     networks:
       - php_pro
 

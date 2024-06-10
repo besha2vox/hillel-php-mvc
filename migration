@@ -1,21 +1,24 @@
+#!/usr/local/bin/php
 <?php
 
 const BASE_DIR = __DIR__;
 require_once BASE_DIR . '/vendor/autoload.php';
 
 use App\Commands\MigrationAdd;
+use App\Commands\MigrationRun;
 use Core\Interfaces\Command;
 use splitbrain\phpcli\CLI;
 use splitbrain\phpcli\Options;
 
 class MigrationsCli extends CLI
 {
+    protected $bin = 'migration';
     protected function setup(Options $options): void
     {
-
         $options->registerCommand("add", "Create migration file");
         $options->registerCommand("run", "Run all migration file");
         $options->registerArgument('name', 'File name', true, 'add');
+        $options->registerOption("help", "Display this help", "h", );
 
         $options->useCompactHelp(true);
     }
@@ -24,6 +27,7 @@ class MigrationsCli extends CLI
     {
         $cmd = match ($options->getCmd()) {
             "add" => new MigrationAdd($this, $options->getArgs()),
+            "run" => new MigrationRun($this, $options->getArgs()),
             default => null
         };
 
