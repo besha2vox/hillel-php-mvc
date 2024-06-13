@@ -7,16 +7,17 @@ use PDO;
 class DB
 {
     static protected PDO|null $instance = null;
+
     static public function connect(): PDO
     {
         if (is_null(self::$instance)) {
-            $dsn = "mysql:host=database;port=3306;dbname=database";
+            $dsn = "mysql:host=" . getenv("DB_HOST") . ";port=3306;dbname=" . getenv("DB_NAME");
             $options = [
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             ];
 
-            self::$instance = new PDO($dsn, "root", "password", $options);
+            self::$instance = new PDO($dsn, getenv("DB_USER"), getenv("DB_PASSWORD"), $options);
         }
 
         return static::$instance;

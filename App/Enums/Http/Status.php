@@ -14,6 +14,7 @@ enum Status: int
     case METHOD_NOT_ALLOWED = 405;
     case REQUEST_TIMEOUT = 408;
     case CONFLICT = 409;
+    case UNPROCESSABLE_ENTITY = 422;
     case INTERNAL_SERVER_ERROR = 500;
 
     public function description(): array
@@ -29,6 +30,8 @@ enum Status: int
             408 => 'Request Timeout',
             409 => 'Conflict',
             500 => 'Internal Server Error',
+            422 => 'Unprocessable Entity',
+            default => 'Unknown Error'
         };
 
         return [

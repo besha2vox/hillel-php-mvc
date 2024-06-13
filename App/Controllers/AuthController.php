@@ -7,8 +7,8 @@ use Core\Controller;
 
 class AuthController extends Controller
 {
-public function register(): array
-{
+    public function register(): array
+    {
         return $this->response(Status::OK, ["response" => "something is working"]);
     }
 }
