@@ -19,3 +19,16 @@ function jsonResponse(Status $status, $data = []): string
         ...$data
     ]);
 }
+
+function requestBody(): array
+{
+    $data = [];
+
+    $requestBody = file_get_contents('php://input');
+
+    if(!empty($requestBody)) {
+        $data = json_decode($requestBody, true);
+    }
+
+    return $data;
+}

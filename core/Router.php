@@ -107,7 +107,7 @@ class Router
         $requestMethod = strtolower($_SERVER['REQUEST_METHOD']);
 
         if ($requestMethod !== strtolower($this->params['method'])) {
-            throw new Exception("Method [$requestMethod] is not allowed for this route", 405);
+            throw new Exception("Method [$requestMethod] is not allowed for this route", Status::METHOD_NOT_ALLOWED);
         }
 
         unset($this->params['method']);
