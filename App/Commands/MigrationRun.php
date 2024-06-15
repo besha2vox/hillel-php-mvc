@@ -11,7 +11,6 @@ use PDOException;
 class MigrationRun implements Command
 {
     const string MIGRATIONS_DIR = BASE_DIR . '/migrations';
-    const string MIGRATIONS_TABLE = '0_migrations.sql';
 
     public function __construct(public MigrationsCli $cli, array $args = [])
     {
@@ -19,6 +18,7 @@ class MigrationRun implements Command
 
     public function run(): void
     {
+
         try {
             db()->beginTransaction();
             $this->cli->info("Migrations process start...");
@@ -66,12 +66,12 @@ CREATE TABLE IF NOT EXISTS migrations (
         $migrations = array_values(array_diff($migrations, ['.', '..']));
 
         $runedMigrations = $this->getRunedMigrations();
-        $this->cli->notice(json_encode($runedMigrations));
+
         if(!empty($migrations)) {
             foreach ($migrations as $migration) {
-                $this->cli->notice("- run" . $migration);
+                $this->cli->notice("- run " . $migration);
                 if(in_array($migration, $runedMigrations)) {
-                    $this->cli->notice("-- skip" . $migration);
+                    $this->cli->notice("-- skip " . $migration);
                     continue;
                 }
 
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS migrations (
                 }
 
                 $this->createMigrationRecord($migration);
-                $this->cli->success("- `$migration` migrated");
+                $this->cli->success("-- $migration was migrated");
             }
         }
 
