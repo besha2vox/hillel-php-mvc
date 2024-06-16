@@ -2,6 +2,7 @@
 
 use App\Enums\Http\Status;
 use Core\DB;
+use Core\JWTToken;
 
 function db()
 {
@@ -31,4 +32,14 @@ function requestBody(): array
     }
 
     return $data;
+}
+
+function getToken(): string
+{
+    $headers = getallheaders();
+    if (!array_key_exists('Authorization', $headers)) {
+        throw new Exception("Unauthorized", Status::UNAUTHORIZED->value);
+    }
+
+    return JWTToken::parseToken($headers["Authorization"]);
 }
