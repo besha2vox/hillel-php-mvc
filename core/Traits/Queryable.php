@@ -14,25 +14,7 @@ trait Queryable
     static protected string $query = '';
     protected array $commands = [];
 
-//    public static function __callStatic(string $name, array $arguments)
-//    {
-//        if ($name == 'where') {
-//            return call_user_func_array([new static, $name], $arguments);
-//        }
-//
-//        throw new Exception("Static method not allowed", Status::UNPROCESSABLE_ENTITY);
-//    }
-//
-//    public function __call(string $name, array $arguments)
-//    {
-//        if ($name == 'where') {
-//            return call_user_func_array([$this, $name], $arguments);
-//        }
-//
-//        throw new Exception("Static method not allowed", Status::UNPROCESSABLE_ENTITY);
-//    }
-
-    static public function select(array $columns = ['*']): static
+    static public function select(array $columns = ['*']): static|false
     {
         static::resetQuery();
         $obj = new static;
@@ -53,7 +35,7 @@ trait Queryable
         return $query->fetchObject(static::class);
     }
 
-    static public function findBy(string $column, mixed $value): static
+    static public function findBy(string $column, mixed $value): static|false
     {
         $query = DB::connect()->prepare('SELECT * FROM ' . static::$table . " WHERE $column = :$column");
         $query->bindParam($column, $value);
@@ -65,10 +47,39 @@ trait Queryable
         return $query->fetchObject(static::class);
     }
 
-    protected function where(string $column, SQL $operator = SQL::EQUAL, mixed $value = null): static
+    static public function create(array $fields): null|static
+    {
+        $params = static::prepareQueryParams($fields);
+
+        $query = db()->prepare(
+            "INSERT INTO " . static::$table . " ($params[keys]) VALUES ($params[placeholders])"
+        );
+
+        foreach ($fields as $key => &$value) {
+            $query->bindParam(':' . $key, $value);
+        }
+
+        if (!$query->execute()) {
+            return null;
+        }
+
+        return static::find(db()->lastInsertId());
+    }
+
+    static protected function prepareQueryParams(array $fields): array
+    {
+        $keys = array_keys($fields);
+        $placeholders = preg_filter('/^/', ':', $keys);
+        return [
+            'keys' => implode(', ', $keys),
+            'placeholders' => implode(', ', $placeholders),
+        ];
+    }
+
+    public function where(string $column, SQL $operator = SQL::EQUAL, mixed $value = null): static
     {
         $this->require(['order', 'limit', 'having', 'group', 'where'], 'WHERE can not be used after');
-        $this->require(['select'], 'WHERE can not be used without ');
+        $this->require(['select'], 'WHERE can not be used without ', true);
         $obj = in_array('select', $this->commands) ? $this : static::select();
 
         if (
@@ -99,7 +110,7 @@ trait Queryable
         return $obj;
     }
 
-    protected function require(array $requireMethods, string $text = ''): void
+    protected function require(array $requireMethods, string $text = '', bool $mustExists = false): void
     {
         foreach ($requireMethods as $method) {
             if (in_array($method, $this->commands)) {
@@ -109,7 +120,12 @@ trait Queryable
                     $text,
                     $method
                 );
-                throw new Exception($message, Status::UNPROCESSABLE_ENTITY);
+
+                if ($mustExists) {
+                    return;
+                }
+                dd($method);
+                throw new Exception($message, Status::UNPROCESSABLE_ENTITY->value);
             }
         }
     }

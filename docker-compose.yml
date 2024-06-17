@@ -26,6 +26,7 @@ services:
       - DB_NAME=database
       - DB_PASSWORD=password
       - DB_USER=root
+      - SECRET=5Wyuifgs*bnmse+f8098+/vbn!#sadRTUrNMSpatbw#
     networks:
       - php_pro
 
