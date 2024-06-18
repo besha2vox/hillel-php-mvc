@@ -41,5 +41,10 @@ function getToken(): string
         throw new Exception("Unauthorized", Status::UNAUTHORIZED->value);
     }
 
-    return JWTToken::parseToken($headers["Authorization"]);
+    return str_replace('Bearer ', '', $headers["Authorization"]);
+}
+
+function authId()
+{
+    return JWTToken::getPayload(getToken())['user_id'];
 }

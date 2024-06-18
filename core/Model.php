@@ -25,15 +25,6 @@ abstract class Model
             $data[$property->getName()] = $vars[$property->getName()] ?? null;
         }
 
-// TODO check this variant
-//        foreach ($properties as $property) {
-//            if (in_array($property, ['commands', 'tableName'])) {
-//                continue;
-//            }
-//            $data[$property] = $this->{$property};
-//        }
-
         return $data;
     }
-
 }

@@ -8,7 +8,6 @@ use App\Validators\Auth\LoginValidator;
 use App\Validators\Auth\RegisterValidator;
 use Core\Controller;
 use Core\JWTToken;
-use ReallySimpleJWT\Token;
 
 class AuthController extends Controller
 {
