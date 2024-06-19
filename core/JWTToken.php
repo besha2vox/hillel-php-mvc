@@ -18,16 +18,13 @@ class JWTToken
 
     static public function createToken(int $userId): string
     {
-        return Token::create($userId, static::getSecret(), static::$expiration, static::$issuer);
+        $expirationTime = time() + static::$expiration;
+        return Token::create($userId, static::getSecret(), $expirationTime, static::$issuer);
     }
 
-    static public function parseToken(string $token): int
+    static public function getPayload(string $token): array
     {
-        $token = str_replace('Bearer ', '', $token);
-
-        if (Token::validate($token, static::getSecret())) {
-            throw new Exception("Incorrect token", Status::UNAUTHORIZED->value);
-        }
+        static::validate($token);
 
         $payload = Token::getPayload($token);
 
@@ -35,6 +32,13 @@ class JWTToken
             throw new Exception("Token expired", Status::UNAUTHORIZED->value);
         }
 
-        return $payload['user_id'];
+        return $payload;
+    }
+
+    static  public function validate(string $token): void
+    {
+        if (!Token::validate($token, static::getSecret())) {
+            throw new Exception("Incorrect token", Status::UNAUTHORIZED->value);
+        }
     }
 }

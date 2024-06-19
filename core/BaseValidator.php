@@ -8,7 +8,7 @@ abstract class BaseValidator
     static protected array $skip = [];
     static protected array $errors = [];
 
-    static public function validate(): bool
+    static public function validate(array $fields): bool
     {
         if (empty(static::$rules)) {
             return true;
@@ -18,12 +18,10 @@ abstract class BaseValidator
             if (in_array($rule, static::$skip)) {
                 continue;
             }
-
-            if(!empty(static::$rules[$rule]) && preg_match(static::$rules[$rule], $value)) {
+            if(!empty(static::$rules[$rule]) && preg_match(static::$rules[$rule], $fields[$rule])) {
                 unset(static::$errors[$rule]);
             }
         }
-
         return empty(static::$errors);
     }
 

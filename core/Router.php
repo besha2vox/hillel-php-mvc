@@ -32,7 +32,6 @@ class Router
     static protected function setUri(string $uri): static
     {
         $uri = preg_replace('/\//', '\\/', $uri);
-        //'api/resource/{id:\d}/update'
         $uri = preg_replace('/\{([a-z_-]+):([^}]+)}/', '(?P<$1>$2)', $uri);
         $uri = "/^$uri$/i";
         $router = static::getInstance();
@@ -107,7 +106,7 @@ class Router
         $requestMethod = strtolower($_SERVER['REQUEST_METHOD']);
 
         if ($requestMethod !== strtolower($this->params['method'])) {
-            throw new Exception("Method [$requestMethod] is not allowed for this route", Status::METHOD_NOT_ALLOWED);
+            throw new Exception("Method [$requestMethod] is not allowed for this route", Status::METHOD_NOT_ALLOWED->value);
         }
 
         unset($this->params['method']);

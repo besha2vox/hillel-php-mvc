@@ -9,7 +9,7 @@ abstract class BaseAuthValidator extends BaseValidator
 {
     static  protected array $rules = [
         'email' => '/^\\S+@\\S+\\.\\S+$/',
-        'password' => '/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/',
+        'password' => '/^(?=.*?[a-z])(?=.*?[0-9])[a-zA-Z0-9#?!@$%^&*-]{8,20}$/',
     ];
 
     static public function checkEmailOnExists(string $email, bool $eqError = true, $message = 'Email already exists'): bool

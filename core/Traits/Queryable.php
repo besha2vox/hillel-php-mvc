@@ -23,7 +23,7 @@ trait Queryable
         return $obj;
     }
 
-    static public function find(int $id): static
+    static public function find(int $id): static|false
     {
         $query = DB::connect()->prepare('SELECT * FROM ' . static::$table . ' WHERE id=:id');
         $query->bindParam('id', $id);
@@ -80,8 +80,26 @@ trait Queryable
     {
         $this->require(['order', 'limit', 'having', 'group', 'where'], 'WHERE can not be used after');
         $this->require(['select'], 'WHERE can not be used without ', true);
-        $obj = in_array('select', $this->commands) ? $this : static::select();
 
+        return $this->prepareAdditionalQuery($column, $operator, $value, 'where');
+    }
+
+    public function and(string $column, SQL $operator = SQL::EQUAL, mixed $value = null): static
+    {
+        $this->require(['where'], 'AND can not be used without', true);
+
+        return $this->prepareAdditionalQuery($column, $operator, $value, 'and');
+    }
+
+    public function or(string $column, SQL $operator = SQL::EQUAL, mixed $value = null): static
+    {
+        $this->require(['where'], 'OR can not be used without');
+
+        return $this->prepareAdditionalQuery($column, $operator, $value, 'or');
+    }
+
+    protected function prepareAdditionalQuery(string $column, SQL $operator, mixed $value, $method): static
+    {
         if (
             !is_null($value) &&
             !is_bool($value) &&
@@ -100,14 +118,47 @@ trait Queryable
             $value = '(' . implode(', ', $value) . ')';
         }
 
-        if (!in_array('where', $obj->commands)) {
-            static::$query .= " WHERE";
-            $obj->commands[] = 'where';
-        }
 
-        static::$query .= " $column $operator->value $value";
+        $this->commands[] = $method;
 
-        return $obj;
+        static::$query .= " " . strtoupper($method) ." $column $operator->value $value";
+
+        return $this;
+    }
+
+    public function update(array $fields): static
+    {
+        $query = "UPDATE " . static::$table . " SET " . $this->updatePlaceholders(array_keys($fields)) . " WHERE id = :id";
+        $query = db()->prepare($query);
+
+        $fields['id'] = $this->id;
+        $query->execute($fields);
+
+        return static::find($this->id);
+    }
+
+    protected function updatePlaceholders(array $keys): string
+    {
+        $transformedKeys = array_map(function($key) {
+            return "`$key` = :$key";
+        }, $keys);
+
+        return implode(', ', $transformedKeys);
+    }
+
+    static public function delete(int $id): bool
+    {
+        $query = db()->prepare('DELETE FROM ' . static::$table . ' WHERE id=:id');
+        $query->bindParam(':id', $id);
+
+        return $query->execute();
+    }
+
+    public function exists(): bool
+    {
+        $this->require(['select'], 'Method exists() can not be used without', true);
+
+        return !empty($this->get());
     }
 
     protected function require(array $requireMethods, string $text = '', bool $mustExists = false): void
@@ -124,7 +175,7 @@ trait Queryable
                 if ($mustExists) {
                     return;
                 }
-                dd($method);
+
                 throw new Exception($message, Status::UNPROCESSABLE_ENTITY->value);
             }
         }
