@@ -195,4 +195,21 @@ trait Queryable
     {
         return static::select($columns)->get();
     }
+
+    public function orderBy(array $columns): static
+    {
+        $this->require(['select'], 'ORDER BY can not be used without', true);
+
+        $this->commands[] = 'order';
+
+        $lastKey = array_key_last($columns);
+
+        static::$query .= " ORDER BY ";
+
+        foreach ($columns as $column => $order) {
+            static::$query .= "$column $order" . ($column !== $lastKey ? ', ' : '');
+        }
+
+        return $this;
+    }
 }

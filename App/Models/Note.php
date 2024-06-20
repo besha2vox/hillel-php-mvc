@@ -8,9 +8,7 @@ class Note extends Model
 {
     static protected ?string $table = 'notes';
 
-    public int $user_id;
-    public int $folder_id;
-    public string $title, $content;
+    public int $folder_id, $user_id;
     public ?bool $pinned, $completed;
-    public ?string $created_at, $updated_at;
+    public ?string $title, $content, $created_at, $updated_at;
 }
