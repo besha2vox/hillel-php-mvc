@@ -18,7 +18,7 @@ abstract class BaseValidator
             if (in_array($rule, static::$skip)) {
                 continue;
             }
-            if(!empty(static::$rules[$rule]) && preg_match(static::$rules[$rule], $fields[$rule])) {
+            if (!empty(static::$rules[$rule]) && preg_match(static::$rules[$rule], $fields[$rule])) {
                 unset(static::$errors[$rule]);
             }
         }
